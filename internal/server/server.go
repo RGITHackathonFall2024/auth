@@ -1,6 +1,8 @@
 package server
 
 import (
+	"log/slog"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -8,17 +10,24 @@ import (
 type Server struct {
 	hostname string
 	port     uint
-	db       *gorm.DB
-	app      *fiber.App
+
+	db     *gorm.DB
+	logger *slog.Logger
+
+	app *fiber.App
 }
 
-func New(hostname string, port uint, db *gorm.DB) *Server {
+func New(hostname string, port uint, db *gorm.DB, logger *slog.Logger) *Server {
 	server := Server{
 		hostname: hostname,
 		port:     port,
-		db:       db,
-		app:      fiber.New(),
+
+		db:     db,
+		logger: logger,
+
+		app: fiber.New(),
 	}
+
 	return &server
 }
 
@@ -32,4 +41,8 @@ func (s *Server) Hostname() string {
 
 func (s *Server) Port() uint {
 	return s.port
+}
+
+func (s *Server) Log() *slog.Logger {
+	return s.logger
 }

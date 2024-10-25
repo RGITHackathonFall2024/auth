@@ -21,6 +21,7 @@ func main() {
 	if err != nil {
 		panic("Error loading .env file")
 	}
+
 	s := server.New(os.Getenv("HOSTNAME"), uint(utils.Must(strconv.ParseUint(os.Getenv("PORT"), 10, 64))), nil)
 	startServer(s)
 }
