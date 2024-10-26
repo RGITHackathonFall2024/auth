@@ -13,15 +13,13 @@ import (
 )
 
 type GetResponse struct {
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
+	Username   string `json:"username"`
 	HomeTown   string `json:"home_town"`
 	University string `json:"university"`
 }
 
 type PostRequest struct {
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
+	Username   string `json:"username"`
 	HomeTown   string `json:"home_town"`
 	University string `json:"university"`
 }
@@ -55,8 +53,7 @@ func GetMe(c *fiber.Ctx) error {
 	log.Debug("Got user", slog.Any("user", usr))
 
 	return c.JSON(&GetResponse{
-		FirstName:  usr.FirstName,
-		LastName:   usr.LastName,
+		Username:   usr.Username,
 		HomeTown:   usr.HomeTown,
 		University: usr.University,
 	})
@@ -88,11 +85,8 @@ func UpdateMe(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 
-	if req.FirstName != "" {
-		usr.FirstName = req.FirstName
-	}
-	if req.LastName != "" {
-		usr.LastName = req.LastName
+	if req.Username != "" {
+		usr.Username = req.Username
 	}
 	if req.HomeTown != "" {
 		usr.HomeTown = req.HomeTown

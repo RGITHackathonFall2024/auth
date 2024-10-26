@@ -71,7 +71,7 @@ func Login(c *fiber.Ctx) error {
 	_, err := user.ByID(s, req.ID)
 	if err != nil {
 		if _, ok := err.(*user.ErrNoSuchUser); ok {
-			return user.Create(s, req.ID, req.FirstName, req.LastName)
+			return user.Create(s, req.ID, req.FirstName+" "+req.LastName)
 		}
 
 		log.Error("Error finding user",

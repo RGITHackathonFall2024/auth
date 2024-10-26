@@ -11,8 +11,7 @@ import (
 type User struct {
 	TelegramID int64 `gorm:"primaryKey"`
 
-	FirstName  string
-	LastName   string
+	Username   string
 	HomeTown   string
 	University string
 
@@ -37,11 +36,10 @@ func ByID(s *server.Server, id int64) (*User, error) {
 	return &user, nil
 }
 
-func Create(s *server.Server, telegramID int64, firstName, lastName string) error {
+func Create(s *server.Server, telegramID int64, username string) error {
 	return s.DB().Create(&User{
 		TelegramID: telegramID,
-		FirstName:  firstName,
-		LastName:   lastName,
+		Username:   username,
 	}).Error
 }
 
