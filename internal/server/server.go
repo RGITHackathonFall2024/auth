@@ -2,7 +2,9 @@ package server
 
 import (
 	"log/slog"
+	"reflect"
 
+	"github.com/RGITHackathonFall2024/auth/pkg/ctxlog"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -47,14 +49,24 @@ func (s *Server) Log() *slog.Logger {
 	return s.logger
 }
 
+func (s *Server) DB() *gorm.DB {
+	return s.db
+}
+
 func FromContext(ctx *fiber.Ctx) *Server {
+	log := ctxlog.WithCtx(slog.Default(), ctx)
+
 	iServer := ctx.Locals("server")
 	if iServer == nil {
+		log.Error("No local server in context")
 		return nil
 	}
 
 	server, ok := iServer.(*Server)
 	if !ok {
+		log.Error("Invalid type of the local server in context",
+			slog.String("got_type", reflect.TypeOf(iServer).String()),
+		)
 		return nil
 	}
 

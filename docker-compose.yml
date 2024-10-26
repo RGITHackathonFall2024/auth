@@ -1,0 +1,19 @@
+services:
+  postgres:
+    container_name: user-postgres
+    image: postgres:latest
+    env_file:
+      - postgres.env
+    ports:
+      - "45439:5432"
+    restart: unless-stopped
+
+  app:
+    container_name: user-service
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8081:43001"
+    depends_on:
+      - postgres
+    restart: unless-stopped
