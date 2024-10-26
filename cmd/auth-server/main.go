@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 
@@ -22,6 +23,8 @@ func main() {
 		panic("Error loading .env file")
 	}
 
-	s := server.New(os.Getenv("HOSTNAME"), uint(utils.Must(strconv.ParseUint(os.Getenv("PORT"), 10, 64))), nil)
+	log := slog.Default()
+
+	s := server.New(os.Getenv("HOSTNAME"), uint(utils.Must(strconv.ParseUint(os.Getenv("PORT"), 10, 64))), nil, log)
 	startServer(s)
 }

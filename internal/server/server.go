@@ -46,3 +46,17 @@ func (s *Server) Port() uint {
 func (s *Server) Log() *slog.Logger {
 	return s.logger
 }
+
+func FromContext(ctx *fiber.Ctx) *Server {
+	iServer := ctx.Locals("server")
+	if iServer == nil {
+		return nil
+	}
+
+	server, ok := iServer.(*Server)
+	if !ok {
+		return nil
+	}
+
+	return server
+}
