@@ -57,7 +57,6 @@ func VerifyHash(log *slog.Logger, id int64, firstName, lastName, username, photo
 	log.Debug("Data check string", slog.String("data_check_string", dataCheckString))
 
 	gotHash := hmac.New(sha256.New, secret[:])
-	log.Debug("Got hash", slog.String("got_hash", string(gotHash.Sum(nil))))
 
 	_, err := gotHash.Write([]byte(dataCheckString))
 	if err != nil {
@@ -65,8 +64,10 @@ func VerifyHash(log *slog.Logger, id int64, firstName, lastName, username, photo
 		return err
 	}
 
-	var gotHashHex []byte
+	gotHashHex := make([]byte, hex.EncodedLen(gotHash.Size()))
 	hex.Encode(gotHashHex, gotHash.Sum(nil))
+	log.Debug("Got hash", slog.String("got_hash", string(gotHashHex)))
+
 	if !hmac.Equal([]byte(hash), gotHashHex) {
 		return &ErrInvalidHash{}
 	}
