@@ -36,6 +36,7 @@ func VerifyHash(log *slog.Logger, id int64, firstName, lastName, username, photo
 	log = log.WithGroup("verify-hash")
 
 	botToken := os.Getenv(consts.EnvTgToken)
+	log.Debug("Bot token", slog.String("bot_token", botToken))
 
 	secret := sha256.Sum256([]byte(botToken))
 	log.Debug("Secret", slog.String("secret", string(secret[:])))
