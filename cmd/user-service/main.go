@@ -14,6 +14,7 @@ import (
 	"github.com/RGITHackathonFall2024/auth/pkg/ctxlog"
 	"github.com/RGITHackathonFall2024/auth/pkg/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
@@ -40,6 +41,7 @@ func startServer(s *server.Server) error {
 
 		return c.Next()
 	})
+	s.App().Use(cors.New())
 
 	handlers.Setup(s)
 
