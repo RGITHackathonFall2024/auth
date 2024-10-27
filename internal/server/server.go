@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var DB *gorm.DB
+
 type Server struct {
 	hostname string
 	port     uint
@@ -30,6 +32,8 @@ func New(hostname string, port uint, db *gorm.DB, logger *slog.Logger) *Server {
 		app: fiber.New(),
 	}
 
+	DB = server.db
+
 	return &server
 }
 
@@ -50,6 +54,10 @@ func (s *Server) Log() *slog.Logger {
 }
 
 func (s *Server) DB() *gorm.DB {
+	if s.db == nil {
+		return DB
+	}
+
 	return s.db
 }
 
@@ -71,7 +79,7 @@ func FromContext(ctx *fiber.Ctx) *Server {
 	}
 
 	if server.db == nil {
-		log.Error("No database connection in context WTF")
+		log.Error("No database connection in context")
 		return nil
 	}
 
