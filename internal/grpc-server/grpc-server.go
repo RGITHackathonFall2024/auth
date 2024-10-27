@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate protoc -I ../grpc-protofiles --go_out=../grpc-user-service --go_opt=paths=source_relative --go-grpc_out=../grpc-user-service --go-grpc_opt=paths=source_relative ../grpc-protofiles/user.proto
 type Server struct {
 	grpc_user_service.UnimplementedUserServer
 	server.Server

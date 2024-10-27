@@ -1,0 +1,3 @@
+[submodule "internal/grpc-protofiles"]
+	path = internal/grpc-protofiles
+	url = https://github.com/RGITHackathonFall2024/grpc-user-service.git
