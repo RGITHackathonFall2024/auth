@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/RGITHackathonFall2024/auth/internal/consts"
+	grpcserver "github.com/RGITHackathonFall2024/auth/internal/grpc-server"
 	"github.com/RGITHackathonFall2024/auth/internal/handlers"
 	initdb "github.com/RGITHackathonFall2024/auth/internal/init-db"
 	"github.com/RGITHackathonFall2024/auth/internal/server"
@@ -43,12 +44,18 @@ func startServer(s *server.Server) error {
 	handlers.Setup(s)
 
 	log.Info("Starting server")
-	if err := s.App().Listen(fmt.Sprintf("%v:%v", s.Hostname(), s.Port())); err != nil {
-		log.Error("Error starting server")
-		return err
+	go func() {
+		if err := s.App().Listen(fmt.Sprintf("%v:%v", s.Hostname(), s.Port())); err != nil {
+			log.Error("Error running server", slog.String("err", err.Error()))
+		}
+	}()
+
+	grpcServer := grpcserver.From(s)
+	log.Info("Starting gRPC server")
+	if err := grpcServer.Start(); err != nil {
+		log.Error("Error running gRPC server", slog.String("err", err.Error()))
 	}
 
-	log.Info("Server started successfully")
 	return nil
 }
 

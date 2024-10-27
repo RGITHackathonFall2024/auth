@@ -13,4 +13,6 @@ const (
 	EnvPostgresDatabase = "POSTGRES_DB"
 	EnvPostgresUser     = "POSTGRES_USER"
 	EnvPostgresPassword = "POSTGRES_PASSWORD"
+
+	EnvGrpcPort = "GRPC_PORT"
 )

@@ -41,7 +41,7 @@ func GetMe(c *fiber.Ctx) error {
 	log := ctxlog.WithCtx(s.Log(), c).WithGroup("get-me")
 
 	log.Info("Getting user by token")
-	usr, err := auth.GetUserByToken(log, c)
+	usr, err := auth.GetUserFromContext(log, c)
 	if err != nil {
 		if errors.Is(err, &auth.ErrInvalidToken{}) || errors.Is(err, &auth.ErrMissingToken{}) {
 			return fiber.ErrUnauthorized
@@ -76,7 +76,7 @@ func UpdateMe(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	usr, err := auth.GetUserByToken(s.Log(), c)
+	usr, err := auth.GetUserFromContext(s.Log(), c)
 	if err != nil {
 		if errors.Is(err, &auth.ErrInvalidToken{}) || errors.Is(err, &auth.ErrMissingToken{}) {
 			return fiber.ErrUnauthorized

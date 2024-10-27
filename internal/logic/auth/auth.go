@@ -89,21 +89,9 @@ func GetToken(log *slog.Logger, c *fiber.Ctx) (string, error) {
 	return token, nil
 }
 
-func GetUserByToken(log *slog.Logger, c *fiber.Ctx) (*user.User, error) {
-	log = log.WithGroup("get-user-by-token")
-
-	s := server.FromContext(c)
-	if s == nil {
-		return nil, &server.ErrNoServerInContext{}
-	}
-
-	tokenStr, err := GetToken(log, c)
-	if err != nil {
-		return nil, err
-	}
-
+func GetUserByToken(log *slog.Logger, s *server.Server, token string) (*user.User, error) {
 	var usr *user.User
-	_, err = jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+	_, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			log.Error("Unexpected signing method", slog.String("method", t.Method.Alg()))
 			return nil, &ErrInvalidToken{}
@@ -139,4 +127,20 @@ func GetUserByToken(log *slog.Logger, c *fiber.Ctx) (*user.User, error) {
 	}
 
 	return usr, nil
+}
+
+func GetUserFromContext(log *slog.Logger, c *fiber.Ctx) (*user.User, error) {
+	log = log.WithGroup("get-user-from-context")
+
+	s := server.FromContext(c)
+	if s == nil {
+		return nil, &server.ErrNoServerInContext{}
+	}
+
+	tokenStr, err := GetToken(log, c)
+	if err != nil {
+		return nil, err
+	}
+
+	return GetUserByToken(log, s, tokenStr)
 }
