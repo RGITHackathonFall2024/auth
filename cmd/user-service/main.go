@@ -77,6 +77,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	if db == nil {
+		log.Error("No database connection")
+		panic("no database connection")
+	}
 
 	if err := initdb.InitDB(db, log); err != nil {
 		log.Error("Error initializing database")
