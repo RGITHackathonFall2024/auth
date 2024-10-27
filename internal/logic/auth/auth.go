@@ -1,21 +1,17 @@
 package auth
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"log/slog"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
 
+	telegramloginwidget "github.com/LipsarHQ/go-telegram-login-widget"
 	"github.com/RGITHackathonFall2024/auth/internal/consts"
 	"github.com/RGITHackathonFall2024/auth/internal/logic/user"
 	"github.com/RGITHackathonFall2024/auth/internal/server"
-	"github.com/RGITHackathonFall2024/auth/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -32,44 +28,57 @@ func GenerateToken(userID string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func VerifyHash(log *slog.Logger, id int64, firstName, lastName, username, photoUrl string, authDate uint64, hash string) error {
+func VerifyHash(log *slog.Logger, tgAuthData *telegramloginwidget.AuthorizationData) error {
 	log = log.WithGroup("verify-hash")
 
-	botToken := os.Getenv(consts.EnvTgToken)
-	log.Debug("Bot token", slog.String("bot_token", botToken))
-
-	secret := sha256.Sum256([]byte(botToken))
-	log.Debug("Secret", slog.String("secret", string(secret[:])))
-
-	dataCheckString := strings.Join(
-		slices.Sorted(utils.Map(
-			slices.Values([][]string{
-				{"id", strconv.FormatInt(id, 10)},
-				{"first_name", firstName},
-				{"last_name", lastName},
-				{"username", username},
-				{"photo_url", photoUrl},
-				{"auth_date", strconv.FormatUint(authDate, 10)},
-			}),
-			func(field []string) string { return strings.Join(field, "=") },
-		)),
-		"\n",
-	)
-	log.Debug("Data check string", slog.String("data_check_string", dataCheckString))
-
-	gotHash := hmac.New(sha256.New, secret[:])
-
-	_, err := gotHash.Write([]byte(dataCheckString))
-	if err != nil {
-		log.Error("Error hashing data check string", slog.String("err", err.Error()))
-		return err
+	if time.Unix(tgAuthData.AuthDate, 0).Add(time.Hour * 24).Before(time.Now()) {
+		return &ErrStaleAuthData{}
 	}
 
-	gotHashHex := make([]byte, hex.EncodedLen(gotHash.Size()))
-	hex.Encode(gotHashHex, gotHash.Sum(nil))
-	log.Debug("Got hash", slog.String("got_hash", string(gotHashHex)))
+	botToken := os.Getenv(consts.EnvTgToken)
 
-	if !hmac.Equal([]byte(hash), gotHashHex) {
+	log.Debug("Bot token", slog.String("bot_token", botToken))
+
+	/*
+		secret := sha256.Sum256([]byte(botToken))
+		log.Debug("Secret", slog.String("secret", string(secret[:])))
+
+		dataCheckString := strings.Join(
+			slices.Sorted(utils.Map(
+				slices.Values([][]string{
+					{"id", strconv.FormatInt(id, 10)},
+					{"first_name", firstName},
+					{"last_name", lastName},
+					{"username", username},
+					{"photo_url", photoUrl},
+					{"auth_date", strconv.FormatUint(authDate, 10)},
+				}),
+				func(field []string) string { return strings.Join(field, "=") },
+			)),
+			"\n",
+		)
+		log.Debug("Data check string", slog.String("data_check_string", dataCheckString))
+
+		gotHash := hmac.New(sha256.New, secret[:])
+		if _, err := gotHash.Write([]byte(dataCheckString)); err != nil {
+			log.Error("Error hashing data check string", slog.String("err", err.Error()))
+			return err
+		}
+
+		gotHashHex := make([]byte, hex.EncodedLen(gotHash.Size()))
+		if n := hex.Encode(gotHashHex, gotHash.Sum(nil)); n != len(gotHashHex) {
+			log.Error("Error encoding hash", slog.Int("n", n), slog.Int("expected", len(gotHashHex)))
+			return &ErrEncodingHash{}
+		}
+
+		log.Debug("Got hash", slog.String("got_hash", string(gotHashHex)))
+
+		if !hmac.Equal([]byte(hash), gotHashHex) {
+			return &ErrInvalidHash{}
+		}
+	*/
+
+	if err := tgAuthData.Check(botToken); err != nil {
 		return &ErrInvalidHash{}
 	}
 

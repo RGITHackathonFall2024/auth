@@ -20,3 +20,10 @@ type ErrInvalidToken struct {
 func (e *ErrInvalidToken) Error() string {
 	return "invalid token"
 }
+
+type ErrStaleAuthData struct {
+}
+
+func (e *ErrStaleAuthData) Error() string {
+	return "stale auth data"
+}

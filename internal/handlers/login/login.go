@@ -1,9 +1,11 @@
 package loginhandler
 
 import (
+	"errors"
 	"log/slog"
 	"strconv"
 
+	telegramloginwidget "github.com/LipsarHQ/go-telegram-login-widget"
 	"github.com/RGITHackathonFall2024/auth/internal/logic/auth"
 	"github.com/RGITHackathonFall2024/auth/internal/logic/user"
 	"github.com/RGITHackathonFall2024/auth/internal/server"
@@ -12,13 +14,14 @@ import (
 )
 
 type Request struct {
-	ID        int64  `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Username  string `json:"username"`
-	PhotoUrl  string `json:"photo_url"`
-	AuthDate  uint64 `json:"auth_date"`
-	Hash      string `json:"hash"`
+	/*	ID        int64  `json:"id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Username  string `json:"username"`
+		PhotoUrl  string `json:"photo_url"`
+		AuthDate  uint64 `json:"auth_date"`
+		Hash      string `json:"hash"`*/
+	telegramloginwidget.AuthorizationData
 }
 
 type Response struct {
@@ -51,16 +54,13 @@ func Login(c *fiber.Ctx) error {
 
 	log.Info("Verifying hash")
 	if err := auth.VerifyHash(log,
-		req.ID,
-		req.FirstName,
-		req.LastName,
-		req.Username,
-		req.PhotoUrl,
-		req.AuthDate,
-		req.Hash,
+		&req.AuthorizationData,
 	); err != nil {
-		if _, ok := err.(*auth.ErrInvalidHash); ok {
+		switch {
+		case errors.Is(err, telegramloginwidget.ErrHashInvalid):
 			return c.Status(fiber.StatusUnauthorized).SendString("Invalid hash")
+		case errors.Is(err, &auth.ErrStaleAuthData{}):
+			return c.Status(fiber.StatusUnauthorized).SendString("Stale auth data")
 		}
 
 		return fiber.ErrInternalServerError

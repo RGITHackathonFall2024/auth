@@ -1,3 +1,5 @@
+github.com/LipsarHQ/go-telegram-login-widget v0.0.0-20231102112033-ec628cac556e h1:q+iI8cLRFZ8++7eQPILiGQqyMnbZyaxjy6vAnisyr5M=
+github.com/LipsarHQ/go-telegram-login-widget v0.0.0-20231102112033-ec628cac556e/go.mod h1:YyMCJtRGvXSqYKuWjrhfLqu2SxEQxAdx3wAaUUzgb4k=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
