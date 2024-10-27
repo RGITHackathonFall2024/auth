@@ -97,6 +97,17 @@ func GetUserByToken(log *slog.Logger, s *server.Server, token string) (*user.Use
 			return nil, &ErrInvalidToken{}
 		}
 
+		exp, err := t.Claims.GetExpirationTime()
+		if err != nil {
+			log.Error("Error getting expiration time", slog.String("err", err.Error()))
+			return nil, &ErrInvalidToken{}
+		}
+
+		if exp.Before(time.Now()) {
+			log.Error("Token expired", slog.Time("exp", exp.Time))
+			return nil, &ErrInvalidToken{}
+		}
+
 		idStr, err := t.Claims.GetSubject()
 		if err != nil {
 			log.Error("Error getting subject", slog.String("err", err.Error()))
