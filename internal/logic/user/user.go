@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	"log/slog"
 	"time"
 
@@ -23,6 +24,11 @@ type User struct {
 func ByID(s *server.Server, id int64) (*User, error) {
 	var user User
 	log := s.Log().WithGroup("user-by-id")
+
+	if s.DB() == nil {
+		log.Error("No database connection")
+		return nil, errors.New("no database connection")
+	}
 
 	if err := s.DB().Where("telegram_id = ?", id).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
