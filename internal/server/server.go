@@ -78,7 +78,7 @@ func FromContext(ctx *fiber.Ctx) *Server {
 		return nil
 	}
 
-	if server.db == nil {
+	if server.DB() == nil {
 		log.Error("No database connection in context")
 		return nil
 	}
