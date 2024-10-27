@@ -87,6 +87,6 @@ func main() {
 		panic(err)
 	}
 
-	s := server.New(os.Getenv(consts.EnvHostname), uint(utils.Must(strconv.ParseUint(os.Getenv("PORT"), 10, 64))), nil, log)
+	s := server.New(os.Getenv(consts.EnvHostname), uint(utils.Must(strconv.ParseUint(os.Getenv("PORT"), 10, 64))), db, log)
 	startServer(s)
 }
